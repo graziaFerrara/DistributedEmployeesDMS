@@ -5,5 +5,6 @@ This repository stores a project which has a distributed architecture and uses S
 The system supports two applications:
 
 * `BusinessInterfaceApplet`
-  This applet allows users to search for employees based on various criteria.
-* `EmployeeService`This service allows employees to manage and update the content of the employee database.
+  * This applet allows users to search for employees based on various criteria.
+* `EmployeeService`
+  * This service allows employees to manage and update the content of the employee database.
