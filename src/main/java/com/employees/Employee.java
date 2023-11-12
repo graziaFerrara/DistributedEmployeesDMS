@@ -4,15 +4,28 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.UUID;
 
-public class Employee implements Serializable{
+/**
+ * Representation of a employee.
+ * @author graziaferrara
+ *
+ */
+public class Employee implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private UUID id;
 	private String name, surname, username, email, department;
 	private HashSet<String> phoneNumbers;
 
-	public Employee(String name, String surname, String username, String email, String department,
-			String phoneNumber) {
+	/**
+	 * Creation of a employee.
+	 * @param name
+	 * @param surname
+	 * @param username
+	 * @param email
+	 * @param department
+	 * @param phoneNumber
+	 */
+	public Employee(String name, String surname, String username, String email, String department, String phoneNumber) {
 		id = UUID.randomUUID();
 		this.name = name;
 		this.surname = surname;
@@ -23,16 +36,47 @@ public class Employee implements Serializable{
 		this.phoneNumbers.add(phoneNumber);
 	}
 
-	public void addPhoneNumber(String phoneNumber) throws Exception {
+	/**
+	 * Method to insert a phone number.
+	 * @param phoneNumber
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean insertPhoneNumber(String phoneNumber) throws Exception {
 		if (phoneNumbers.contains(phoneNumber))
 			throw new Exception("Phone number already present");
 		phoneNumbers.add(phoneNumber);
+		return true;
 	}
 
-	public void deletePhoneNumber(String phoneNumber) throws Exception {
+	/**
+	 * Method to update a phone number.
+	 * @param oldPhoneNumber
+	 * @param newPhoneNumber
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean updatePhoneNumber(String oldPhoneNumber, String newPhoneNumber) throws Exception {
+		if (!phoneNumbers.contains(oldPhoneNumber))
+			throw new Exception("Old phone number not present");
+		if (phoneNumbers.contains(newPhoneNumber))
+			throw new Exception("New phone number already present");
+		phoneNumbers.remove(oldPhoneNumber);
+		phoneNumbers.add(newPhoneNumber);
+		return true;
+	}
+
+	/**
+	 * Method to remove a phone number.
+	 * @param phoneNumber
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean removePhoneNumber(String phoneNumber) throws Exception {
 		if (!phoneNumbers.contains(phoneNumber))
 			throw new Exception("Phone number not present");
 		phoneNumbers.remove(phoneNumber);
+		return true;
 	}
 
 	public UUID getId() {
@@ -93,8 +137,17 @@ public class Employee implements Serializable{
 
 	@Override
 	public String toString() {
-		return "Employee [id=" + id + ", name=" + name + ", username=" + username + ", email=" + email + ", department="
-				+ department + ", phoneNumbers=" + phoneNumbers + "]";
+		StringBuilder phoneNumbersStr = new StringBuilder();
+		for (String phoneNumber : phoneNumbers) {
+			phoneNumbersStr.append(phoneNumber).append(", ");
+		}
+		if (phoneNumbersStr.length() > 0) {
+			phoneNumbersStr.setLength(phoneNumbersStr.length() - 2); // Remove the extra comma and space
+		}
+
+		return "Employee {" + "id=" + id + ", name='" + name + '\'' + ", surname='" + surname + '\'' + ", username='"
+				+ username + '\'' + ", email='" + email + '\'' + ", department='" + department + '\''
+				+ ", phoneNumbers=" + (phoneNumbers.isEmpty() ? "[]" : "[" + phoneNumbersStr + "]") + '}';
 	}
 
 }
