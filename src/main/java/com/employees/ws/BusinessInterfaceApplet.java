@@ -12,7 +12,7 @@ import database.Database;
  * @author graziaferrara
  *
  */
-public class BusinessInterfaceApplet {
+public class BusinessInterfaceApplet implements EmployeeSearchService {
 
 	private static Database database = new Database();
 
