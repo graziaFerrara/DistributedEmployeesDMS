@@ -9,7 +9,7 @@ import database.Database;
  * @author graziaferrara
  *
  */
-public class EmployeeService implements EmployeeManagementService{
+public class EmployeeService extends BusinessInterfaceApplet implements EmployeeManagementService{
 
 	private static Database database = new Database();
 	

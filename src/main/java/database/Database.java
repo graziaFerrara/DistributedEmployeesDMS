@@ -1,6 +1,13 @@
 package database;
 
 import com.employees.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -13,6 +20,11 @@ public class Database {
 
 	private static HashMap<UUID, Employee> database = new HashMap<>();
 	private static HashMap<String, UUID> usernameIDCorrespondance = new HashMap<>();
+	private static String databaseFileName = "database.ser", corrFileName = "corr.ser";
+	
+	public Database() {
+		loadDatabase();
+	}
 
 	// Search operations
 
@@ -151,6 +163,7 @@ public class Database {
 		Employee newEmployee = new Employee(name, surname, username, email, department, phoneNumbers);
 		database.put(newEmployee.getId(), newEmployee);
 		usernameIDCorrespondance.put(username, newEmployee.getId());
+		saveDatabase();
 		return true;
 	}
 
@@ -166,6 +179,7 @@ public class Database {
 			throw new Exception("Employee not found");
 		database.remove(id);
 		usernameIDCorrespondance.remove(username);
+		saveDatabase();
 		return true;
 	}
 
@@ -182,6 +196,7 @@ public class Database {
 		Employee empl = database.get(id);
 		database.remove(id);
 		usernameIDCorrespondance.remove(empl.getUsername());
+		saveDatabase();
 		return true;
 	}
 
@@ -302,15 +317,21 @@ public class Database {
 	}
 
 	private boolean insertPhoneNumber(UUID id, String phoneNumber) throws Exception {
-		return database.get(id).insertPhoneNumber(phoneNumber);
+		boolean res =  database.get(id).insertPhoneNumber(phoneNumber);
+		saveDatabase();
+		return res;
 	}
 	
 	private boolean updatePhoneNumber(UUID id, String oldPhoneNumber, String newPhoneNumber) throws Exception {
-		return database.get(id).updatePhoneNumber(oldPhoneNumber, newPhoneNumber);
+		boolean res =  database.get(id).updatePhoneNumber(oldPhoneNumber, newPhoneNumber);
+		saveDatabase();
+		return res;
 	}
 
 	private boolean removePhoneNumber(UUID id, String phoneNumber) throws Exception {
-		return database.get(id).removePhoneNumber(phoneNumber);
+		boolean res =  database.get(id).removePhoneNumber(phoneNumber);
+		saveDatabase();
+		return res;
 	}
 
 	private boolean updateField(UUID id, String fieldToUpdate, String newValue) throws Exception {
@@ -333,6 +354,7 @@ public class Database {
 		default:
 			throw new Exception("Not valid field");
 		}
+		saveDatabase();
 		return true;
 	}
 
@@ -356,6 +378,47 @@ public class Database {
 		if (usernameIDCorrespondance.containsKey(newValue))
 			throw new Exception("Username already in use");
 		database.get(id).setUsername(newValue);
+	}
+	
+	private static void saveDatabase() {
+		try {
+			ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(databaseFileName));
+			os.writeObject(database);
+			os.close();
+			os = new ObjectOutputStream(new FileOutputStream(corrFileName));
+			os.writeObject(usernameIDCorrespondance);
+			os.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static void loadDatabase() {
+		try {
+            File file = new File(databaseFileName);
+            if (file.exists()) {
+                ObjectInputStream objectIn = new ObjectInputStream(new FileInputStream(databaseFileName));
+                database = (HashMap<UUID, Employee>) objectIn.readObject();
+                objectIn.close();
+            } else {
+                saveDatabase();
+            }
+            try {
+                file = new File(corrFileName);
+                if (file.exists()) {
+                    ObjectInputStream objectIn = new ObjectInputStream(new FileInputStream(corrFileName));
+                    usernameIDCorrespondance = (HashMap<String, UUID>) objectIn.readObject();
+                    objectIn.close();
+                } else {
+                    saveDatabase();
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 	}
 
 }
